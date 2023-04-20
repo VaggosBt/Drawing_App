@@ -16,6 +16,7 @@
     <color name="lollipop">#35a79c</color>
     <color name="random">#A349B1</color>
     <color name="undoButtonColor">#000000</color>
+    <color name="textColor">#000000</color>
 
 
 </resources>
