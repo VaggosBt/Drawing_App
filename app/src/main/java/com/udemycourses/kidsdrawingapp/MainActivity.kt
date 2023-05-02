@@ -223,6 +223,38 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private suspend fun saveBitmapFile(mBitmap: Bitmap?) : String{
+        var result = ""
+        withContext(Dispatchers.IO){
+            if(mBitmap != null){
+                try{
+                    val bytes = ByteArrayOutputStream()
+                    mBitmap.compress(Bitmap.CompressFormat.PNG,90, bytes)
+
+                    val f = File(externalCacheDir?.absoluteFile.toString() + File.separator + "DrawingApp_" + System.currentTimeMillis()/1000 + ".png")
+                    val fo = FileOutputStream(f)
+                    fo.write(bytes.toByteArray())
+                    fo.close()
+
+                    result = f.absolutePath
+                    runOnUiThread{
+                        if(!result.isNotEmpty()){
+                            Toast.makeText(this@MainActivity,"File saved successfully: $result", Toast.LENGTH_SHORT).show()
+
+                            shareImage(FileProvider.getUriForFile(baseContext,"com.udemycourses.kidsdrawingapp", f))
+
+                        }else{
+                            Toast.makeText(this@MainActivity,"Something went wrong while saving the file", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }catch (e: Exception){
+                    result = ""
+                    e.printStackTrace()
+                }
+            }
+        }
+        return result
+    }
 
 
     private fun getBitmapFromView(view: View) : Bitmap {
@@ -283,38 +315,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun saveBitmapFile(mBitmap: Bitmap?) : String{
-        var result = ""
-        withContext(Dispatchers.IO){
-            if(mBitmap != null){
-                try{
-                    val bytes = ByteArrayOutputStream()
-                    mBitmap.compress(Bitmap.CompressFormat.PNG,90, bytes)
 
-                    val f = File(externalCacheDir?.absoluteFile.toString() + File.separator + "DrawingApp_" + System.currentTimeMillis()/1000 + ".png")
-                    val fo = FileOutputStream(f)
-                    fo.write(bytes.toByteArray())
-                    fo.close()
-
-                    result = f.absolutePath
-                    runOnUiThread{
-                        if(!result.isNotEmpty()){
-                            Toast.makeText(this@MainActivity,"File saved successfully: $result", Toast.LENGTH_SHORT).show()
-
-                            shareImage(FileProvider.getUriForFile(baseContext,"com.udemycourses.kidsdrawingapp", f))
-
-                        }else{
-                            Toast.makeText(this@MainActivity,"Something went wrong while saving the file", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }catch (e: Exception){
-                    result = ""
-                    e.printStackTrace()
-                }
-            }
-        }
-        return result
-    }
 
     private fun isReadStorageAllowed(): Boolean{
         val result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
